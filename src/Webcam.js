@@ -67,8 +67,7 @@ export default function ProcessVideoComponent() {
 
   return (
     <div>
-      lol
-      <video ref={video} autoPlay playsInline />
+      <video ref={video} autoPlay playsInline style={{ display: "none" }}/>
       <img
         src={`data:image/jpeg;base64,${processedImage}`} // Adjust the MIME type based on your image format
         alt="Processed"
