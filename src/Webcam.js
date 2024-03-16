@@ -1,12 +1,9 @@
-import { useParams } from "react-router-dom";
 import { useRef, useEffect, useState } from "react";
 import "./Webcam.css";
 
 
 export default function ProcessVideoComponent() {
-  const [websocket, setWebsocket] = useState(null);
   const [processedImage, setProcessedImage] = useState(null);
-  const webSocketRef = useRef();
   const video = useRef(null);
 
   useEffect(() => {
