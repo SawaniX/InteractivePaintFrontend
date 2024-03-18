@@ -1,15 +1,13 @@
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-// import React, {useState, useEffect} from 'react';
-// import api from './api'
 import Navbar from "./Navbar"
 import Board from "./Webcam"
 
 
 function MainView() {
   return (
-    <div>
+    <div className='wrapper-about'>
       <Navbar />
       <Board />
     </div>
