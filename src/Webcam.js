@@ -4,6 +4,7 @@ import "./Webcam.css";
 
 export default function ProcessVideoComponent() {
   const [processedImage, setProcessedImage] = useState(null);
+  const [sketch, setSketch] = useState(null);
   const video = useRef(null);
 
   useEffect(() => {
@@ -43,7 +44,7 @@ export default function ProcessVideoComponent() {
           const imageDataURL = canvas.toDataURL('image/jpeg');
 
           sendVideo(imageDataURL)
-        }, 1000 / 25);
+        }, 1000 / 10);
       } catch (error) {
         console.error('Error accessing websam: ', error)
       }
@@ -52,10 +53,9 @@ export default function ProcessVideoComponent() {
     enableWebcam();
 
     webSocketRef.onmessage = (event) => {
-      const processedImageData = event.data;
-      console.log(processedImageData)
-      // Update state with processed image data
-      setProcessedImage(processedImageData);
+      const data = JSON.parse(event.data)
+      setProcessedImage(data.processed_input);
+      setSketch(data.sketch)
     };
 
     return () => {
@@ -69,8 +69,12 @@ export default function ProcessVideoComponent() {
     <div>
       <video ref={video} autoPlay playsInline style={{ display: "none" }}/>
       <img
-        src={`data:image/jpeg;base64,${processedImage}`} // Adjust the MIME type based on your image format
-        alt="Processed"
+        src={`data:image/jpeg;base64,${processedImage}`}
+        alt="ProcessedInput"
+      />
+      <img
+        src={`data:image/jpeg;base64,${sketch}`}
+        alt="Sketch"
       />
     </div>
   );
