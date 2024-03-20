@@ -4,6 +4,7 @@ import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
+import Button from 'react-bootstrap/Button';
 import line_width from './icons/line_width.svg';
 import color from './icons/color.svg';
 import shape from './icons/shape.svg';
@@ -37,7 +38,7 @@ function LineIcon(src) {
   )
 }
   
-export default function NavBar() {
+export default function NavBar( {inpaintSketch} ) {
   return (
     <Navbar expand="lg" bg="dark" data-bs-theme="dark">
       <Container>
@@ -75,6 +76,7 @@ export default function NavBar() {
             </NavDropdown>
           </Nav>
         </Navbar.Collapse>
+        <Button onClick={inpaintSketch} className="justify-content-end" type="submit">Inpaint sketch</Button>
       </Container>
     </Navbar>
   )
