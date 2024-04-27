@@ -6,6 +6,21 @@ export default function ProcessVideoComponent() {
   const [processedImage, setProcessedImage] = useState(null);
   const [sketch, setSketch] = useState(null);
   const video = useRef(null);
+  const [painted, setPainted] = useState(null);
+
+  const inpaintSketch = async () => {
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sketch: sketch, model: 'dogs' })
+    };
+    const response = await fetch('http://localhost:8000/fill_sketch', requestOptions);
+    if (!response.ok) {
+      throw new Error('Failed to fetch data from the server');
+    }
+    const data = await response.json();
+    setPainted(data.inpainted);
+  }
 
   useEffect(() => {
     const webSocketRef = new WebSocket('ws://localhost:8000/virtual_paint');
@@ -72,10 +87,23 @@ export default function ProcessVideoComponent() {
         src={`data:image/jpeg;base64,${processedImage}`}
         alt="ProcessedInput"
       />
+      <div className='inpaintContainer'>
+        <input
+          type={'button'}
+          value={'Inpaint Sketch'}
+          onClick={inpaintSketch}
+        />
+      </div>
       <img
         src={`data:image/jpeg;base64,${sketch}`}
         alt="Sketch"
       />
+      {painted && (
+        <img
+          src={`data:image/jpeg;base64,${painted}`}
+          alt="Inpainted sketch"
+        />
+      )}
     </div>
   );
 }
