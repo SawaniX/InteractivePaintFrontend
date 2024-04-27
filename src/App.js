@@ -1,13 +1,21 @@
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { v4 as uuidv4 } from 'uuid';
 
 import Navbar from "./Navbar"
 import Board from "./Webcam"
 
 
 function MainView() {
+  const [uniqueId, setUniqueId] = useState(null);
   const [painted, setPainted] = useState(null);
+
+  useEffect(() => {
+    // Generate a unique ID when the component mounts
+    const id = uuidv4(); // Generate a UUID
+    setUniqueId(id);
+  }, []);
 
   const inpaintSketch = async () => {
     const response = await fetch('http://localhost:8000/fill_sketch'); // Replace 'your-backend-url' with the actual URL
@@ -21,7 +29,7 @@ function MainView() {
   return (
     <div className='wrapper-about'>
       <Navbar inpaintSketch={inpaintSketch} />
-      <Board />
+      <Board uuid={uniqueId} />
       {painted && (
         <img
           src={`data:image/jpeg;base64,${painted}`}
