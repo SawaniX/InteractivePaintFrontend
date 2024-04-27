@@ -2,7 +2,7 @@ import { useRef, useEffect, useState } from "react";
 import "./Webcam.css";
 
 
-export default function ProcessVideoComponent( {uuid} ) {
+export default function ProcessVideoComponent() {
   const [processedImage, setProcessedImage] = useState(null);
   const [sketch, setSketch] = useState(null);
   const video = useRef(null);
@@ -52,10 +52,6 @@ export default function ProcessVideoComponent( {uuid} ) {
 
     enableWebcam();
 
-    webSocketRef.onopen = () => {
-      webSocketRef.send(uuid)
-    };
-
     webSocketRef.onmessage = (event) => {
       const data = JSON.parse(event.data)
       setProcessedImage(data.processed_input);
@@ -67,7 +63,7 @@ export default function ProcessVideoComponent( {uuid} ) {
         webSocketRef.close();
       }
     };
-  }, [uuid]);
+  }, []);
 
   return (
     <div>
