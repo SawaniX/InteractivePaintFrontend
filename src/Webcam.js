@@ -1,12 +1,36 @@
 import { useRef, useEffect, useState } from "react";
 import "./Webcam.css";
 
+import Button from 'react-bootstrap/Button';
+import ButtonGroup from 'react-bootstrap/ButtonGroup';
+import ToggleButton from 'react-bootstrap/ToggleButton';
+
 
 export default function ProcessVideoComponent() {
   const [processedImage, setProcessedImage] = useState(null);
   const [sketch, setSketch] = useState(null);
   const video = useRef(null);
   const [painted, setPainted] = useState(null);
+
+  const [colorValue, setColorValue] = useState('1');
+  const colors = [
+    { name: 'Black', value: '0'},
+    { name: 'Red', value: '1' },
+    { name: 'Green', value: '2' },
+    { name: 'Blue', value: '3' },
+  ];
+  const [thicknessValue, setThicknessValue] = useState('1');
+  const thicknesses = [
+    { name: 'Tiny', value: '0'},
+    { name: 'Medium', value: '1' },
+    { name: 'Large', value: '2' },
+    { name: 'Massive', value: '3' },
+  ];
+  const [shapeValue, setShapeValue] = useState('1');
+  const shapes = [
+    { name: 'Rectangle', value: '0'},
+    { name: 'Circle', value: '1' },
+  ];
 
   const inpaintSketch = async () => {
     const requestOptions = {
@@ -83,25 +107,86 @@ export default function ProcessVideoComponent() {
   return (
     <div>
       <video ref={video} autoPlay playsInline style={{ display: "none" }}/>
-      <img
-        src={`data:image/jpeg;base64,${processedImage}`}
-        alt="ProcessedInput"
-      />
-      <div className='inpaintContainer'>
-        <input
-          type={'button'}
-          value={'Inpaint Sketch'}
-          onClick={inpaintSketch}
-        />
+      <div className="container">
+        <div className="left-image">
+          <img
+            src={`data:image/jpeg;base64,${processedImage}`}
+            alt="ProcessedInput"
+            className="processed-image"
+          />
+        </div>
+        <div className='inpaintContainer'>
+          {/* <div className='download-buttons'>
+            <Button variant="primary" size="lg" className="toggle-button">Download camera</Button>
+            <Button variant="primary" size="lg" className="toggle-button">Download sketch</Button>
+            <Button variant="primary" size="lg" className="toggle-button">Download inpaint</Button>
+          </div> */}
+          <ButtonGroup>
+            {colors.map((color, idx) => (
+              <ToggleButton
+                className="toggle-button"
+                key={idx}
+                id={`color-${idx}`}
+                type="radio"
+                variant={'primary'}
+                name="color"
+                value={color.value}
+                checked={colorValue === color.value}
+                onChange={(e) => setColorValue(e.currentTarget.value)}
+              >
+                {color.name}
+              </ToggleButton>
+            ))}
+          </ButtonGroup>
+          <ButtonGroup>
+            {thicknesses.map((thickness, idx) => (
+              <ToggleButton
+                className="toggle-button"
+                key={idx}
+                id={`thickness-${idx}`}
+                type="radio"
+                variant={'primary'}
+                name="thickness"
+                value={thickness.value}
+                checked={thicknessValue === thickness.value}
+                onChange={(e) => setThicknessValue(e.currentTarget.value)}
+              >
+                {thickness.name}
+              </ToggleButton>
+            ))}
+          </ButtonGroup>
+          <ButtonGroup>
+            {shapes.map((shape, idx) => (
+              <ToggleButton
+                className="toggle-button"
+                key={idx}
+                id={`shape-${idx}`}
+                type="radio"
+                variant={'primary'}
+                name="shape"
+                value={shape.value}
+                checked={shapeValue === shape.value}
+                onChange={(e) => setShapeValue(e.currentTarget.value)}
+              >
+                {shape.name}
+              </ToggleButton>
+            ))}
+          </ButtonGroup>
+          <Button variant="outline-light" onClick={inpaintSketch}>Inpaint Sketch</Button>
+        </div>
+        <div className="right-image">
+          <img
+            src={`data:image/jpeg;base64,${sketch}`}
+            alt="Sketch"
+            className="sketch-image"
+          />
+        </div>
       </div>
-      <img
-        src={`data:image/jpeg;base64,${sketch}`}
-        alt="Sketch"
-      />
       {painted && (
         <img
           src={`data:image/jpeg;base64,${painted}`}
           alt="Inpainted sketch"
+          className="inpainted-image"
         />
       )}
     </div>
