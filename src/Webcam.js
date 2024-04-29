@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useMemo } from "react";
 import "./Webcam.css";
 
 import Button from 'react-bootstrap/Button';
@@ -12,24 +12,19 @@ export default function ProcessVideoComponent() {
   const video = useRef(null);
   const [painted, setPainted] = useState(null);
 
-  const [colorValue, setColorValue] = useState('1');
+  const [colorValue, setColorValue] = useState('BLACK');
   const colors = [
-    { name: 'Black', value: '0'},
-    { name: 'Red', value: '1' },
-    { name: 'Green', value: '2' },
-    { name: 'Blue', value: '3' },
+    { name: 'Black', value: 'BLACK'},
+    { name: 'Red', value: 'RED' },
+    { name: 'Green', value: 'GREEN' },
+    { name: 'Blue', value: 'BLUE' },
   ];
-  const [thicknessValue, setThicknessValue] = useState('1');
+  const [thicknessValue, setThicknessValue] = useState('MEDIUM');
   const thicknesses = [
-    { name: 'Tiny', value: '0'},
-    { name: 'Medium', value: '1' },
-    { name: 'Large', value: '2' },
-    { name: 'Massive', value: '3' },
-  ];
-  const [shapeValue, setShapeValue] = useState('1');
-  const shapes = [
-    { name: 'Rectangle', value: '0'},
-    { name: 'Circle', value: '1' },
+    { name: 'Tiny', value: 'TINY'},
+    { name: 'Medium', value: 'MEDIUM' },
+    { name: 'Large', value: 'LARGE' },
+    { name: 'Massive', value: 'MASSIVE' },
   ];
 
   const inpaintSketch = async () => {
@@ -46,15 +41,34 @@ export default function ProcessVideoComponent() {
     setPainted(data.inpainted);
   }
 
-  useEffect(() => {
-    const webSocketRef = new WebSocket('ws://localhost:8000/virtual_paint');
+  const webSocketRef = useMemo(() => new WebSocket('ws://localhost:8000/virtual_paint'), []);
 
+  const sendData = (setting, value) => {
+    if (setting === 'color') {
+      setColorValue(value)
+    } else if (setting === 'thickness') {
+      setThicknessValue(value)
+    }
+    if (webSocketRef && webSocketRef.readyState === WebSocket.OPEN) {
+      const request = {
+        [setting]: value
+      }
+      webSocketRef.send(JSON.stringify(request));
+    } else {
+      console.error('WebSocket is not open');
+    }
+  }
+
+  useEffect(() => {
     const sendVideo = (bytes) => {
       // Check if the WebSocket is open before sending the video stream
       if (webSocketRef && webSocketRef.readyState === WebSocket.OPEN) {
         // Assuming you have a function on the backend to handle the video stream
         console.log('Wysylam')
-        webSocketRef.send(bytes);
+        const request = {
+          'image': bytes
+        }
+        webSocketRef.send(JSON.stringify(request));
       } else {
         console.error('WebSocket is not open');
       }
@@ -95,6 +109,8 @@ export default function ProcessVideoComponent() {
       const data = JSON.parse(event.data)
       setProcessedImage(data.processed_input);
       setSketch(data.sketch)
+      setColorValue(data.color)
+      setThicknessValue(data.thickness)
     };
 
     return () => {
@@ -102,7 +118,7 @@ export default function ProcessVideoComponent() {
         webSocketRef.close();
       }
     };
-  }, []);
+  }, [webSocketRef]);
 
   return (
     <div>
@@ -132,7 +148,7 @@ export default function ProcessVideoComponent() {
                 name="color"
                 value={color.value}
                 checked={colorValue === color.value}
-                onChange={(e) => setColorValue(e.currentTarget.value)}
+                onChange={(e) => sendData('color', e.currentTarget.value)}
               >
                 {color.name}
               </ToggleButton>
@@ -149,26 +165,9 @@ export default function ProcessVideoComponent() {
                 name="thickness"
                 value={thickness.value}
                 checked={thicknessValue === thickness.value}
-                onChange={(e) => setThicknessValue(e.currentTarget.value)}
+                onChange={(e) => sendData('thickness', e.currentTarget.value)}
               >
                 {thickness.name}
-              </ToggleButton>
-            ))}
-          </ButtonGroup>
-          <ButtonGroup>
-            {shapes.map((shape, idx) => (
-              <ToggleButton
-                className="toggle-button"
-                key={idx}
-                id={`shape-${idx}`}
-                type="radio"
-                variant={'primary'}
-                name="shape"
-                value={shape.value}
-                checked={shapeValue === shape.value}
-                onChange={(e) => setShapeValue(e.currentTarget.value)}
-              >
-                {shape.name}
               </ToggleButton>
             ))}
           </ButtonGroup>
