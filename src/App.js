@@ -5,8 +5,10 @@ import Board from "./Webcam"
 
 
 function MainView() {
+  document.body.style.backgroundColor = "#191719";
+
   return (
-    <div className='wrapper-about'>
+    <div>
       <Board />
     </div>
   )
