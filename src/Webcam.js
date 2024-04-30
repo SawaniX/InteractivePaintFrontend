@@ -26,12 +26,18 @@ export default function ProcessVideoComponent() {
     { name: 'Large', value: 'LARGE' },
     { name: 'Massive', value: 'MASSIVE' },
   ];
+  const [modelValue, setModelValue] = useState('dogs');
+  const models = [
+    { name: 'Dog', value: 'dogs'},
+    { name: 'Butterfly', value: 'butterfly' },
+    { name: 'Shoe', value: 'shoes' },
+  ];
 
   const inpaintSketch = async () => {
     const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sketch: sketch, model: 'dogs' })
+      body: JSON.stringify({ sketch: sketch, model: modelValue })
     };
     const response = await fetch('http://localhost:8000/fill_sketch', requestOptions);
     if (!response.ok) {
@@ -49,6 +55,7 @@ export default function ProcessVideoComponent() {
     } else if (setting === 'thickness') {
       setThicknessValue(value)
     }
+
     if (webSocketRef && webSocketRef.readyState === WebSocket.OPEN) {
       const request = {
         [setting]: value
@@ -168,6 +175,23 @@ export default function ProcessVideoComponent() {
                 onChange={(e) => sendData('thickness', e.currentTarget.value)}
               >
                 {thickness.name}
+              </ToggleButton>
+            ))}
+          </ButtonGroup>
+          <ButtonGroup>
+            {models.map((model, idx) => (
+              <ToggleButton
+                className="toggle-button"
+                key={idx}
+                id={`model-${idx}`}
+                type="radio"
+                variant={'primary'}
+                name="model"
+                value={model.value}
+                checked={modelValue === model.value}
+                onChange={(e) => setModelValue(e.currentTarget.value)}
+              >
+                {model.name}
               </ToggleButton>
             ))}
           </ButtonGroup>
